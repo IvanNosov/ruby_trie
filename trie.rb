@@ -1,6 +1,6 @@
 class Node
-  attr_reader :data, :children
   attr_accessor :med
+  attr_reader :data, :children
   def initialize(data)
     @data = data
     @children = []
@@ -8,30 +8,33 @@ class Node
   end
 
   def key?(key)
-    @children.each { |k| return true if k == key }
+    @children.each { |k| return true if k.data == key }
     false
   end
 
-  def get_key(key)
-    @children.each{ |k| return k if k == key}
+  def search(key)
+    @children.each{ |k| return k if k.data == key}
   end
 
   def insert(key)
-    return get_key(key) if key? key
-    @children << Node.new(key) unless key? key
+    return search(key) if key? key
+    child = Node.new(key)
+    @children << child
+    child
   end
+
 end
 
 class Trie
   attr_reader :root
   def initialize
-    @root = Node.new('')
+    @root = Node.new(nil)
   end
 
   def insert(word)
     node = @root
-    word.size.times do |i|
-      child = node.insert(word[i])
+    word.to_s.each_char do |i|
+      child = node.insert(i)
       node = child
     end
     node.med = true
@@ -39,10 +42,12 @@ class Trie
 
   def have?(word)
     node = @root
-    word.size.times do |i|
-      return false unless node.have?(word[i])
-      node = node.get(word[i])
+    word.to_s.each_char do |i|
+      return false unless node.search i
+      node = node.search i
     end
-    node.term
+    node.med
   end
 end
+
+
